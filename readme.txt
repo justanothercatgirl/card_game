@@ -1,1 +1,2 @@
-TODO: main loop and game rules
+Yesssss it's finally done
+I got 15 metadollars for this in my school
