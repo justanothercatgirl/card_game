@@ -20,8 +20,8 @@
 #endif
     
 
-enum type { m1, m2, m3, m4 };
-enum cost { c2, c3, c4, c6, c7, c8, c9, c10, c11 };
+enum type { m1 = 1, m2, m3, m4 };
+enum cost { c2 = 2, c3, c4, c6 = 6, c7, c8, c9, c10, c11 };
     
 struct card
 {
@@ -75,7 +75,7 @@ std::queue<card> generate_queue()
     std::queue<card> ret;
     for(const auto& x: tmp)
         ret.push(x);
-        
+    
     return ret;
 }
 
@@ -83,53 +83,53 @@ template <size_t size>
 inline std::array<card, size> 
 give_cards(std::queue<card>& q)
 {
-	std::array<card, size> ret;
-	for(auto &x: ret)
-	{
-		x = q.front();
-		q.pop();
-	}
-	return ret;
+    std::array<card, size> ret;
+    for(auto &x: ret)
+    {
+        x = q.front();
+        q.pop();
+    }
+    return ret;
 }
 
 template <size_t size> inline 
 typename std::array<card, size>::iterator
 find_biggest(std::array<card, size> &arr)
 {
-	auto ret = arr.end()-1;
-	for(auto it = arr.begin(); it != arr.end(); ++it)
-		if((*it).c > (*ret).c) ret = it;
-		
-	return ret;
+    auto ret = arr.end()-1;
+    for(auto it = arr.begin(); it != arr.end(); ++it)
+        if((*it).c > (*ret).c) ret = it;
+    	
+    return ret;
 }
 
 template <size_t size> void 
 print_player(std::array<card, size> arr)
 {
-	for(auto x: arr)
-		print(x);
-		
-	std::cout.put('\n');
+    for(auto x: arr)
+        print(x);
+    
+    std::cout.put('\n');
 }
 
 template <size_t size>
 void do_auto_exchanges(
-	std::array<card, size> &p_dominant,
-	std::array<card, size> &p_submissive,
-	std::queue<card> &q)
+    std::array<card, size> &p_dominant,
+    std::array<card, size> &p_submissive,
+    std::queue<card> &q)
 {
-	//do two times
-	for(char _ = 0; _ < 2; ++_)
-	{
-		auto x1 = find_biggest(p_dominant);
-		auto x2 = p_submissive.begin() + std::distance(p_dominant.begin(), x1);
-		std::iter_swap(x1, x2);
-	}
-	
-	auto x1 = find_biggest(p_dominant);
-	q.push(*x1);
-	*x1 = q.front();
-	q.pop();
+    //do two times
+    for(char _ = 0; _ < 2; ++_)
+    {
+    	auto x1 = find_biggest(p_dominant);
+    	auto x2 = p_submissive.begin() + std::distance(p_dominant.begin(), x1);
+    	std::iter_swap(x1, x2);
+    }
+    
+    auto x1 = find_biggest(p_dominant);
+    q.push(*x1);
+    *x1 = q.front();
+    q.pop();
 }
 
 template <size_t size>
@@ -137,9 +137,9 @@ unsigned int get_response_flags(const std::array<card, size>& arr)
 {
     std::cout << "your cards are:\n";
     print_player(arr);
-
+    
 input:
-
+    
     std::cout << "would you like to\n"
         "1. exchange 1 card with opponent?\n"
         "2. exchange 2 cards with opponent?\n"
@@ -195,7 +195,6 @@ exchange:
         std::cout << *p_submissive.begin() << '\n';
         __DEBUG__("before exchange: pl.1: " << *(p_dominant.begin() + index - 1) 
             << ", pl.2: " << *(p_submissive.begin() + index - 1));
-        
 #endif
         std::iter_swap(
             p_dominant.begin() + index - 1,
@@ -209,7 +208,6 @@ exchange:
         std::cout << *p_submissive.begin() << '\n';
         __DEBUG__("after exchange: pl.1: " << *(p_dominant.begin() + index - 1) 
             << ", pl.2: " << *(p_submissive.begin() + index - 1));
-
 #endif
 
         std::cout << "your new card set:\n";
@@ -261,70 +259,76 @@ std::string game()
 {
     using namespace std::chrono_literals;
     
-	std::queue<card> q(generate_queue());
+    std::queue<card> q(generate_queue());
     std::array<card, 5> player1 = give_cards<5>(q), 
                         player2 = give_cards<5>(q);
-	
-	bool exit = false;
-	for(bool turn{true}; ; turn = !turn)
-	{
-		if (turn)
-		{
-		    __DEBUG__("turn player");
-		    unsigned int flags = get_response_flags(player1);
-		    parse_flagged_input(flags, player1, player2, q);
-		}
-		else
-		{
-		    __DEBUG__("turn computer");
-		    std::cout << "player 2 doing things...";
-		    std::this_thread::sleep_for(2s);
-		    do_auto_exchanges(player2, player1, q);
-		    std::cout << "\nplayer 2 done!\nyour cards are:\n";
-		    
-		    print_player(player1);
-		    std::cout << "go for 1 more round? [Y/n]\n";
-    		char input;
-    		std::cin >> input;
-    		switch(input)
-    		{
-    		case 'n': [[fallthrough]]
-    		case 'N':
-    		    goto end;
-    		default:
-    		    ;
-    		}
-		}
-	}
+    
+    bool exit = false;
+    for(bool turn{true}; ; turn = !turn)
+    {
+        if (turn)
+        {
+            __DEBUG__("turn player");
+            unsigned int flags = get_response_flags(player1);
+            parse_flagged_input(flags, player1, player2, q);
+        }
+        else
+        {
+            __DEBUG__("turn computer");
+            std::cout << "player 2 doing things...";
+            std::this_thread::sleep_for(2s);
+            do_auto_exchanges(player2, player1, q);
+            std::cout << "\nplayer 2 done!\nyour cards are:\n";
+            
+            print_player(player1);
+            std::cout << "go for 1 more round? [Y/n]\n";
+            char input;
+            std::cin >> input;
+            switch(input)
+            {
+            case 'n': [[fallthrough]]
+            case 'N': goto end;
+            default : ;
+            }
+        }
+    }
 
 end:
     std::cout << "your cards are: \n"; print_player(player1);
     std::cout <<"Bot's cards are: \n"; print_player(player2);
-	return count(player1) >= count(player2) ? "Player 1" : "Bot";
+    return count(player1) <= count(player2) ? "Player 1" : "Bot";
 
 }
 
 int main()
 {
-	std::map<std::string, int> wins = {{"Player 1", 0}, {"Bot", 0}};
-	
-	bool _continue = true;
-	do {
-	    wins[game()]++;
-	    win_statistics(wins);
-	    std::cout << "continue? [Yn]\n";
-	    char input;
-	    std::cin >> input;
-	    switch(input)
-	    {
+    std::cout << "\e[1;4;33mthe goal of this game is to get cards that will\n"
+                 "sum up to the minimal amount possible. every turn you\n"
+                 "can exchange cards with other player or with deck.\n"
+                 "exchange with player is always done before the exchange\n"
+                 "with deck. after each turn you can either finish the game\n"
+                 "or go for 1 more round. after each game, the win statistics\n"
+                 "are printed.\n\e[0m";
+    
+    std::map<std::string, int> wins = {{"Player 1", 0}, {"Bot", 0}};
+    
+    bool _continue = true;
+    do {
+        wins[game()]++;
+        win_statistics(wins);
+        std::cout << "continue? [Yn]\n";
+        char input;
+        std::cin >> input;
+        switch(input)
+        {
         case 'n':
         case 'N':
             _continue = false;
         default:
             ;
-	    }
-	    
-	} while(_continue);
-	
+        }
+
+    } while(_continue);
+    
     return 0;
 }
