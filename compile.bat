@@ -1,0 +1,1 @@
+C:\TDM-GCC-64\bin\gcc.exe -std=c++20 -o game.exe game.cpp
